@@ -1,6 +1,7 @@
 package com.recipes.app.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,12 @@ public class UserService {
     }
 
     public User getById(Long id) {
-        return userRepository.findById(id).get();
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isPresent()) {
+            return user.get();
+        }
+        return null;
     }
 
     public List<User> list() {
@@ -33,10 +39,18 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User update(Long id,User user) {
-        User userToUpdate = userRepository.findById(id).get();
-        userToUpdate.setName(user.getName());
-        return userRepository.save(userToUpdate);
+    public User update(Long id, User user) {
+
+        Optional<User> searchResult = userRepository.findById(id);
+
+        User userToUpdate = null;
+        if (searchResult.isPresent()) {
+            userToUpdate = searchResult.get();
+            userToUpdate.setName(user.getName());
+            userRepository.save(userToUpdate);
+        }
+
+        return userToUpdate;
     }
 
 }
